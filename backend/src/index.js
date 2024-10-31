@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');  // Importar Pool para manejar la conexión a PostgreSQL
 const routes = require('./routes');  // Importar rutas
+const crearTablas = require('./setup'); // Importar función para crear tablas
 
 const app = express();
 const PORT = process.env.PORT || 5000;  // Usar la variable de entorno PORT
@@ -24,7 +25,10 @@ const pool = new Pool({
 // Rutas
 app.use('/api', routes);
 
+// Crear las tablas al iniciar el servidor
+crearTablas();
+
 // Iniciar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
