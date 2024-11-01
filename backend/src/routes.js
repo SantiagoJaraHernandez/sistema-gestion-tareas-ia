@@ -1,70 +1,28 @@
+// src/routes/index.js
 const express = require('express');
 const router = express.Router();
-const Tarea = require('./models/Tarea');
+const tareasController = require('./controllers/tareasController');
+const usuariosController = require('./controllers/usuariosController');
+const etiquetasController = require('./controllers/etiquetasController');
+const comentariosController = require('./controllers/comentariosController');
 
-// Crear tarea
-router.post('/tareas', async (req, res) => {
-    const { titulo, descripcion, fecha_entrega, importancia, estimacion_tiempo } = req.body;
-    try {
-        const nuevaTarea = await Tarea.create({
-            titulo,
-            descripcion,
-            fecha_entrega,
-            importancia,
-            estimacion_tiempo
-        });
-        res.json(nuevaTarea);
-    } catch (error) {
-        res.status(500).json({ error: 'Error creando la tarea' });
-    }
-});
+// Rutas para las tareas 
+router.post('/tareas', tareasController.crearTarea);
+router.get('/tareas', tareasController.obtenerTareas);
+router.get('/tareas/priorizadas', tareasController.obtenerTareasPriorizadas); // Nueva ruta para tareas priorizadas
+router.put('/tareas/:id', tareasController.actualizarTarea);
+router.delete('/tareas/:id', tareasController.eliminarTarea);
 
-// Obtener todas las tareas
-router.get('/tareas', async (req, res) => {
-    try {
-        const tareas = await Tarea.findAll();
-        res.json(tareas);
-    } catch (error) {
-        res.status(500).json({ error: 'Error obteniendo tareas' });
-    }
-});
+// Rutas de usuarios
+router.post('/usuarios', usuariosController.crearUsuario);
+router.get('/usuarios', usuariosController.obtenerUsuarios);
 
-// Editar tarea
-router.put('/tareas/:id', async (req, res) => {
-    const { id } = req.params;
-    const { titulo, descripcion, fecha_entrega, importancia, estimacion_tiempo } = req.body;
-    try {
-        const tarea = await Tarea.findByPk(id);
-        if (tarea) {
-            tarea.titulo = titulo;
-            tarea.descripcion = descripcion;
-            tarea.fecha_entrega = fecha_entrega;
-            tarea.importancia = importancia;
-            tarea.estimacion_tiempo = estimacion_tiempo;
-            await tarea.save();
-            res.json(tarea);
-        } else {
-            res.status(404).json({ error: 'Tarea no encontrada' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error actualizando tarea' });
-    }
-});
+// Rutas de etiquetas
+router.post('/etiquetas', etiquetasController.crearEtiqueta);
+router.get('/etiquetas', etiquetasController.obtenerEtiquetas);
 
-// Eliminar tarea
-router.delete('/tareas/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const tarea = await Tarea.findByPk(id);
-        if (tarea) {
-            await tarea.destroy();
-            res.json({ mensaje: 'Tarea eliminada' });
-        } else {
-            res.status(404).json({ error: 'Tarea no encontrada' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error eliminando tarea' });
-    }
-});
+// Rutas de comentarios
+router.post('/comentarios', comentariosController.crearComentario);
+router.get('/comentarios', comentariosController.obtenerComentarios);
 
 module.exports = router;
