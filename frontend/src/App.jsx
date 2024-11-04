@@ -3,9 +3,11 @@ import './App.css'
 function App() {
   return (
     <>
-     <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1> 
+      <div class= "bg-primary h-10">
+        <h1 class="text-3xl font-sans underlin bg-secondary flex justify-center h-5">
+          Hello world!
+        </h1> 
+      </div>
     </>
   )
 }
