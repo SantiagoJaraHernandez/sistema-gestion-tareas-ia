@@ -1,4 +1,3 @@
-// src/routes/routes.js
 const express = require('express');
 const router = express.Router();
 const tareasController = require('../controllers/tareasController');
@@ -15,6 +14,9 @@ router.post('/auth/login', authController.login); // Inicio de sesión
 // Rutas protegidas que requieren autenticación
 router.get('/tareas', authMiddleware, tareasController.obtenerTareas);
 router.post('/tareas', authMiddleware, tareasController.crearTarea);
+
+// Nueva ruta para obtener tareas priorizadas (ya protegida con authMiddleware)
+router.get('/tareas/priorizadas', authMiddleware, tareasController.obtenerTareasPriorizadas);
 
 // Otras rutas no protegidas
 router.put('/tareas/:id', tareasController.actualizarTarea);
