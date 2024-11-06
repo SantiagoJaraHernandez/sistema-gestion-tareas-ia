@@ -1,4 +1,3 @@
-// src/setup.js
 const { Pool } = require('pg'); // Importar Pool para manejar la conexión a PostgreSQL
 require('dotenv').config(); // Cargar variables de entorno
 
@@ -30,6 +29,7 @@ const crearTablas = async () => {
         fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         fecha_vencimiento TIMESTAMP,
         estado VARCHAR(50) DEFAULT 'pendiente',
+        prioridad INT DEFAULT 1,  -- Columna agregada para almacenar el nivel de prioridad de la tarea
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
     );`;
 
@@ -63,5 +63,5 @@ const crearTablas = async () => {
   }
 };
 
-// Exportar la función para su uso en index.js
+// Exportar la función para su uso en app.js
 module.exports = crearTablas;

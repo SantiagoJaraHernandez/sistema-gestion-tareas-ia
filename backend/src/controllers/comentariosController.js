@@ -1,5 +1,6 @@
 // src/controllers/comentariosController.js
-const pool = require('../db');
+const pool = require('../database/db');
+
 
 const crearComentario = async (req, res) => {
   const { tarea_id, usuario_id, comentario } = req.body;
