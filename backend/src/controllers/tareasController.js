@@ -1,9 +1,25 @@
-// src/controllers/tareasController.js
-const pool = require('../db'); // Asegúrate de tener un archivo de conexión a la DB
+const pool = require('../database/db');
 
 // Constantes para puntuación
 const MAX_PUNTUACION = 100;
-const IMPORTANCIA_MIN = 0;
+const IMPORTANCIA_MIN = 1;
+
+// Función para convertir texto en tiempo estimado (como "2 horas" a 2)
+const convertirTiempoEstimado = (tiempo) => {
+    const match = tiempo.match(/\d+/); // Buscar solo números en el string
+    return match ? parseFloat(match[0]) : 0; // Retorna el número encontrado o 0 si no se encuentra ninguno
+};
+
+// Función para validar y convertir la importancia a un valor numérico dentro del rango 1-5
+const obtenerImportancia = (importancia) => {
+    if (typeof importancia === 'string') {
+        const importanciaNum = parseInt(importancia, 10);
+        if (!isNaN(importanciaNum) && importanciaNum >= 1 && importanciaNum <= 5) {
+            return importanciaNum;
+        }
+    }
+    return 1; // Valor por defecto si no es válido
+};
 
 // Función para calcular la puntuación de cada tarea
 const calcularPuntuacion = (fecha_vencimiento, importancia, tiempo_estimado) => {
@@ -26,7 +42,6 @@ const calcularPuntuacion = (fecha_vencimiento, importancia, tiempo_estimado) => 
 
     return Math.min(MAX_PUNTUACION, puntuacionTotal); // Limitar la puntuación a un máximo de 100
 };
-
 
 // Algoritmo de priorización
 const priorizarTareas = (tareas) => {
@@ -51,14 +66,21 @@ const priorizarTareas = (tareas) => {
         .sort((a, b) => b.puntuacion - a.puntuacion); // Ordena de mayor a menor puntuación
 };
 
-
 // Crear una nueva tarea
 const crearTarea = async (req, res) => {
-    const { usuario_id, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importancia, tiempo_estimado } = req.body;
+    const { titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importancia, tiempo_estimado } = req.body;
+    const usuarioId = req.usuario.id; // Obtener el id del usuario desde el token (autenticación)
+
+    // Convertir el valor de importancia a un número
+    const importanciaNumerica = obtenerImportancia(importancia);
+
+    // Convertir tiempo_estimado (por ejemplo "2 horas" a 2)
+    const tiempoEstimadoNumerico = convertirTiempoEstimado(tiempo_estimado);
+
     try {
         const result = await pool.query(
             'INSERT INTO tareas (usuario_id, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importancia, tiempo_estimado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [usuario_id, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importancia, tiempo_estimado]
+            [usuarioId, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importanciaNumerica, tiempoEstimadoNumerico]
         );
         res.status(201).json(result.rows[0]);
     } catch (error) {
@@ -68,11 +90,19 @@ const crearTarea = async (req, res) => {
 
 // Obtener todas las tareas
 const obtenerTareas = async (req, res) => {
+    const usuarioId = req.usuario.id; // Obtén el ID del usuario desde el token
+
     try {
-        const result = await pool.query('SELECT * FROM tareas');
-        res.status(200).json(result.rows);
+        // Consulta solo las tareas que pertenezcan al usuario loggeado
+        const tareas = await pool.query('SELECT * FROM tareas WHERE usuario_id = $1', [usuarioId]);
+
+        if (tareas.rows.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron tareas para este usuario.' });
+        }
+
+        res.status(200).json({ tareas: tareas.rows });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener tareas: ' + error.message });
+        res.status(500).json({ message: 'Error en el servidor', error });
     }
 };
 
@@ -91,17 +121,22 @@ const obtenerTareasPriorizadas = async (req, res) => {
 const actualizarTarea = async (req, res) => {
     const { id } = req.params;
     const { usuario_id, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importancia, tiempo_estimado } = req.body;
+    
+    // Convertir importancia y tiempo_estimado antes de la actualización
+    const importanciaNumerica = obtenerImportancia(importancia);
+    const tiempoEstimadoNumerico = convertirTiempoEstimado(tiempo_estimado);
+
     try {
         const result = await pool.query(
             'UPDATE tareas SET usuario_id = $1, titulo = $2, descripcion = $3, fecha_creacion = $4, fecha_vencimiento = $5, estado = $6, importancia = $7, tiempo_estimado = $8 WHERE id = $9 RETURNING *',
-            [usuario_id, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importancia, tiempo_estimado, id]
+            [usuario_id, titulo, descripcion, fecha_creacion, fecha_vencimiento, estado, importanciaNumerica, tiempoEstimadoNumerico, id]
         );
 
-        if (result.rowCount > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(404).json({ error: 'Tarea no encontrada' });
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Tarea no encontrada' });
         }
+
+        res.status(200).json(result.rows[0]);
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar tarea: ' + error.message });
     }
@@ -110,22 +145,24 @@ const actualizarTarea = async (req, res) => {
 // Eliminar una tarea
 const eliminarTarea = async (req, res) => {
     const { id } = req.params;
+
     try {
         const result = await pool.query('DELETE FROM tareas WHERE id = $1 RETURNING *', [id]);
-        if (result.rowCount > 0) {
-            res.status(200).json({ mensaje: 'Tarea eliminada' });
-        } else {
-            res.status(404).json({ error: 'Tarea no encontrada' });
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Tarea no encontrada' });
         }
+
+        res.status(200).json({ message: 'Tarea eliminada con éxito' });
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar tarea: ' + error.message });
     }
 };
 
-module.exports = { 
-    crearTarea, 
-    obtenerTareas, 
-    obtenerTareasPriorizadas, // Exportar la nueva función
-    actualizarTarea, 
-    eliminarTarea 
+module.exports = {
+    crearTarea,
+    obtenerTareas,
+    obtenerTareasPriorizadas,
+    actualizarTarea,
+    eliminarTarea
 };

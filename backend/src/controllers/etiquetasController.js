@@ -1,5 +1,6 @@
 // src/controllers/etiquetasController.js
-const pool = require('../db');
+const pool = require('../database/db');
+
 
 const crearEtiqueta = async (req, res) => {
   const { nombre } = req.body;

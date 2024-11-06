@@ -1,5 +1,5 @@
 // src/controllers/usuariosController.js
-const pool = require('../db'); // Asegúrate de tener un archivo de conexión a la DB
+const pool = require('../database/db'); // Asegúrate de tener un archivo de conexión a la DB
 
 // Crear un nuevo usuario
 const crearUsuario = async (req, res) => {
