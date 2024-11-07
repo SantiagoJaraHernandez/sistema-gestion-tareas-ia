@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 
 # Cargar el modelo entrenado
-model = joblib.load('ai/models/prioridad_model.pkl')
+model = joblib.load('backend/ai/models/prioridad_model.pkl')
 
 # Obtener los argumentos pasados desde Node.js
 tiempo_estimado = float(sys.argv[1])

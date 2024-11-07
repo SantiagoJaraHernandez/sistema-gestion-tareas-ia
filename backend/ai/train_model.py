@@ -5,7 +5,7 @@ from sklearn.metrics import mean_squared_error
 import joblib
 
 # Cargar los datos desde el CSV
-df = pd.read_csv('ai/data/tareas_data.csv')
+df = pd.read_csv('backend/ai/data/tareas_data.csv')
 
 # Características (X) y etiqueta (y)
 X = df[['tiempo_estimado', 'importancia', 'dias_restantes']]
@@ -26,4 +26,4 @@ mse = mean_squared_error(y_test, predicciones)
 print(f"Mean Squared Error: {mse}")
 
 # Guardar el modelo entrenado
-joblib.dump(model, 'ai/models/prioridad_model.pkl')
+joblib.dump(model, 'backend/ai/models/prioridad_model.pkl')
