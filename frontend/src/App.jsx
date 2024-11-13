@@ -9,6 +9,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Welcome from './components/Auth/Welcome';
 import ProtectedRoute from './components/ProtectedRoute';
+import CreateTaskForm from './components/CreateTaskForm';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/tareas" element={<ProtectedRoute><TaskList /></ProtectedRoute>} />
-          <Route path="/tareas/nueva" element={<ProtectedRoute><TaskForm /></ProtectedRoute>} />
+          <Route path="/tareas/nueva" element={<ProtectedRoute><CreateTaskForm /></ProtectedRoute>} />
           <Route path="/tareas/:id" element={<ProtectedRoute><TaskDetail /></ProtectedRoute>} />
         </Routes>
       </div>

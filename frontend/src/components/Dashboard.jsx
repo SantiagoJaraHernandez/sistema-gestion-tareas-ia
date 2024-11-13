@@ -174,7 +174,17 @@ function Dashboard() {
             ) : (
               <p className="text-gray-400">No se encontraron tareas prioritarias.</p>
             )}
+            
           </section>
+          
+          {/* Botón para redirigir a CreateTaskForm */}
+          <button
+            onClick={() => navigate('/tareas/nueva')}
+            className="fixed bottom-8 right-8 bg-green-600 text-white py-2 px-4 rounded-full shadow-lg hover:bg-green-500 transition-all duration-300"
+          >
+            + Crear Tarea
+          </button>
+          
         </div>
       </div>
     </div>
