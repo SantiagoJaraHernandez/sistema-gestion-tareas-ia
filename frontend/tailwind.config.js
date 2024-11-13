@@ -1,17 +1,17 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}"
+    "./src/**/*.{js,ts,jsx,tsx,html}"
   ],
   theme: {
     extend: {
-      colors:{
-        primary: '#bec3bc',
-        secondary: '#d90057',
-        accent: '#666F88',
-        background: '#F5F8FA',
-        text: '#FFFFFF',
+      colors: {
+        primary: '#1e293b',      // Un gris oscuro para los fondos
+        secondary: '#f43f5e',    // Un tono de rojo oscuro para destacar elementos importantes
+        accent: '#64748b',       // Un gris azulado para los detalles
+        background: '#111827',   // Fondo muy oscuro
+        text: '#E5E7EB',         // Texto claro para resaltar sobre el fondo oscuro
       },
       fontFamily: {
         sans: ['Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
@@ -20,4 +20,3 @@ export default {
   },
   plugins: [],
 }
-

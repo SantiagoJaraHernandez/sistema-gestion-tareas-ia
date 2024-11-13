@@ -7,30 +7,29 @@ const comentariosController = require('../controllers/comentariosController');
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Rutas de autenticación
+// Rutas de autenticación (públicas)
 router.post('/auth/register', authController.register); // Registro de usuarios
 router.post('/auth/login', authController.login); // Inicio de sesión
 
 // Rutas protegidas que requieren autenticación
 router.get('/tareas', authMiddleware, tareasController.obtenerTareas);
 router.post('/tareas', authMiddleware, tareasController.crearTarea);
+router.get('/tareas/priorizadas', authMiddleware, tareasController.obtenerTareasPriorizadas); // Tareas priorizadas
+router.put('/tareas/:id', authMiddleware, tareasController.actualizarTarea); // Protección añadida
+router.delete('/tareas/:id', authMiddleware, tareasController.eliminarTarea); // Protección añadida
 
-// Nueva ruta para obtener tareas priorizadas (ya protegida con authMiddleware)
-router.get('/tareas/priorizadas', authMiddleware, tareasController.obtenerTareasPriorizadas);
-
-// Otras rutas no protegidas
-router.put('/tareas/:id', tareasController.actualizarTarea);
-router.delete('/tareas/:id', tareasController.eliminarTarea);
-
-// Rutas de usuarios (sin protección para el ejemplo)
-router.get('/usuarios', usuariosController.obtenerUsuarios);
+// Rutas de usuarios (puedes proteger si no debe ser pública)
+router.get('/usuarios', authMiddleware, usuariosController.obtenerUsuarios); // Protección añadida
+router.get('/usuarios/me', authMiddleware, usuariosController.obtenerUsuarioAutenticado); // Obtener usuario autenticado
+router.get('/usuarios/:id', authMiddleware, usuariosController.obtenerUsuario); // Obtener un usuario por ID
+router.post('/usuarios', usuariosController.crearUsuario);
 
 // Rutas de etiquetas
-router.post('/etiquetas', authMiddleware, etiquetasController.crearEtiqueta);
-router.get('/etiquetas', etiquetasController.obtenerEtiquetas);
+router.post('/etiquetas', authMiddleware, etiquetasController.crearEtiqueta); // Proteger la creación de etiquetas
+router.get('/etiquetas', authMiddleware, etiquetasController.obtenerEtiquetas); // Protección añadida para obtener etiquetas
 
 // Rutas de comentarios
-router.post('/comentarios', authMiddleware, comentariosController.crearComentario);
-router.get('/comentarios', comentariosController.obtenerComentarios);
+router.post('/comentarios', authMiddleware, comentariosController.crearComentario); // Proteger la creación de comentarios
+router.get('/comentarios', authMiddleware, comentariosController.obtenerComentarios); // Protección añadida para obtener comentarios
 
 module.exports = router;

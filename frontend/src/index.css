@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Eliminar márgenes y padding por defecto */
+*,
+*::before,
+*::after {
+  @apply m-0 p-0 box-border;
+}
+
+/* Establecer fondo oscuro y color de texto */
+body {
+  @apply bg-gray-900 text-gray-200 font-sans;
+}
+
+/* Asegurar que el contenedor principal ocupe toda la altura */
+html,
+body,
+#root {
+  @apply h-full;
+}
